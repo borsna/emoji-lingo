@@ -1,2 +1,2 @@
-# emoji-lingo
+# 👨‍🏫 Emoji Lingo
 Learn words with emojis!

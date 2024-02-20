@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>👨‍🏫 emoji-lingo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        body{font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
+
+    </style>
+  </head>
+  <body>
+    <div id="emoji-lingo">
+      <div v-for="w in dictionary.words">
+        <span class="emoji">{{ w.emoji }}</span>
+        <em>{{ w.en }}</em>
+      </div>
+    </div>
+    
+    <script>
+      const { createApp, ref, reactive } = Vue
+      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRh2dkXIBWh2x1YGk1BDcSlu0K6DjdE1GB-9K57HAB33C7ArFcVQMvZnoT6MOMWV-NZKR52N-CmBZgA/pub?output=csv"
+
+      createApp({
+        setup() {
+          const dictionary = reactive({})
+
+          return {
+            dictionary
+          }
+        },
+        mounted(){
+          var self = this
+
+          Papa.parse(csvUrl, {
+            download: true,
+            header: true,
+            complete: function(results) {
+              self.dictionary.words = results.data
+            }
+          })
+        }
+      }).mount('#emoji-lingo')
+    </script>
+  </body>
+</html>
