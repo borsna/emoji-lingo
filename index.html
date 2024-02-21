@@ -29,13 +29,19 @@
   </head>
   <body>
     <div id="emoji-lingo">
+      
+      
+      
       <nav class="light-blue lighten-1" role="navigation">
         <div class="nav-wrapper container">
           <a id="logo-container" href="#" class="brand-logo">Emoji Lingo</a> 
           <span class="badge word-badge">{{ dictionary.words.length }} words</span>
         </div>
       </nav>
-      <div class="container">
+      <div v-if="dictionary.words.length === 0" class="progress">
+        <div class="indeterminate"></div>
+      </div>
+      <div v-if="dictionary.words.length" class="container">
         
         <h3>Choose category</h3>
         <div class="collection">
@@ -45,7 +51,7 @@
         <a class="waves-effect waves-light btn-large word">🧀</a>
         <hr>
         <div>
-          <span v-for="word in dictionary.words">{{ word.emoji }}</span>
+          <span v-for="word in dictionary.words" :title="word.en">{{ word.emoji }}</span>
         </div>
       </div>
     </div>
