@@ -13,13 +13,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
     <style>
-      body{
-        -webkit-user-select: none; /* Safari */
-        -ms-user-select: none; /* IE 10 and IE 11 */
-        user-select: none; /* Standard syntax */
+      body{/*
+        -webkit-user-select: none; 
+        -ms-user-select: none; 
+        user-select: none;*/
       }
       .word{
         font-size: 2rem;
+        margin:0.3rem;
       }
       .word-badge{
         margin-top:0.3rem;
@@ -29,9 +30,6 @@
   </head>
   <body>
     <div id="emoji-lingo">
-      
-      
-      
       <nav class="light-blue lighten-1" role="navigation">
         <div class="nav-wrapper container">
           <a id="logo-container" href="#" class="brand-logo">Emoji Lingo</a> 
@@ -49,6 +47,9 @@
         </div>
         <hr>
         <a class="waves-effect waves-light btn-large word">🧀</a>
+        <a class="waves-effect waves-light btn-large word">🍣</a>
+        <a class="waves-effect waves-light btn-large word">🍛</a>
+        <a class="waves-effect waves-light btn-large word">🍔</a>
         <hr>
         <div>
           <span v-for="word in dictionary.words" :title="word.en">{{ word.emoji }}</span>
