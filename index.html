@@ -40,19 +40,19 @@
         <div class="indeterminate"></div>
       </div>
       <div v-if="dictionary.words.length" class="container">
-        
-        <h3>Choose category</h3>
-        <div class="collection">
-          <a v-for="category in dictionary.categories" href="#" class="collection-item">{{ category }}</a>
+        <div v-if="state.category == null">        
+          <h3>Categories</h3>
+          <div class="collection">
+            <a v-for="category in dictionary.categories" @click="state.category = category" href="#" class="collection-item">
+              {{ categoryEmoji(category) }} {{ category }}
+            </a>
+          </div>
         </div>
-        <hr>
-        <a class="waves-effect waves-light btn-large word">🧀</a>
-        <a class="waves-effect waves-light btn-large word">🍣</a>
-        <a class="waves-effect waves-light btn-large word">🍛</a>
-        <a class="waves-effect waves-light btn-large word">🍔</a>
-        <hr>
-        <div>
-          <span v-for="word in dictionary.words" :title="word.en">{{ word.emoji }}</span>
+        <div v-if="state.category != null">
+          <a class="waves-effect waves-light btn-large word">🧀</a>
+          <a class="waves-effect waves-light btn-large word">🍣</a>
+          <a class="waves-effect waves-light btn-large word">🍛</a>
+          <a class="waves-effect waves-light btn-large word">🍔</a>
         </div>
       </div>
     </div>
@@ -65,7 +65,7 @@
         setup() {
           const dictionary = reactive({words: [], categories: []})
           const state = reactive({
-            category:null
+            category: null
           })
 
           return {
@@ -83,6 +83,14 @@
               self.dictionary.categories = [...new Set(self.dictionary.words.map(item => item.category))]
             }
           })
+        },
+        methods: {
+          categoryEmoji(category){
+            return this.dictionary.words.find((word) => word.category == category).emoji
+          },
+          start(category){
+            this.state.category = category
+          }
         }
       }).mount('#emoji-lingo')
     </script>
