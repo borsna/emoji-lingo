@@ -43,29 +43,37 @@
         <div v-if="state.category == null">        
           <h3>Categories</h3>
           <div class="collection">
-            <a v-for="category in dictionary.categories" @click="state.category = category" href="#" class="collection-item">
-              {{ categoryEmoji(category) }} {{ category }}
+            <a v-for="category in dictionary.categories" @click="start(category)" href="#" class="collection-item">
+              {{ getFirstEmojiByCategory(category) }} {{ category }}
             </a>
           </div>
         </div>
         <div v-if="state.category != null">
-          <a class="waves-effect waves-light btn-large word">🧀</a>
-          <a class="waves-effect waves-light btn-large word">🍣</a>
-          <a class="waves-effect waves-light btn-large word">🍛</a>
-          <a class="waves-effect waves-light btn-large word">🍔</a>
+          <p>{{ state.currentWord.en }}</p>
+          <a v-for="alternative in state.alternatives" class="waves-effect waves-light btn-large word">{{ alternative.emoji }}</a>
         </div>
       </div>
     </div>
     
     <script>
       const { createApp, ref, reactive } = Vue
-      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRh2dkXIBWh2x1YGk1BDcSlu0K6DjdE1GB-9K57HAB33C7ArFcVQMvZnoT6MOMWV-NZKR52N-CmBZgA/pub?output=csv"
+      let csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRh2dkXIBWh2x1YGk1BDcSlu0K6DjdE1GB-9K57HAB33C7ArFcVQMvZnoT6MOMWV-NZKR52N-CmBZgA/pub?output=csv"
+      if(location.hostname == 'localhost'){
+        csvUrl = "words.csv"
+      }
+            
+      Array.prototype.random = function () {
+        return this[Math.floor((Math.random()*this.length))];
+      }
 
       createApp({
         setup() {
           const dictionary = reactive({words: [], categories: []})
           const state = reactive({
-            category: null
+            category: null,
+            usedWords: [],
+            currentWord : null,
+            alternatives : []
           })
 
           return {
@@ -79,17 +87,37 @@
             download: true,
             header: true,
             complete: function(results) {
+              console.log(self.dictionary.words)
               self.dictionary.words = results.data.filter(word => {return word.jpKana != ''})
               self.dictionary.categories = [...new Set(self.dictionary.words.map(item => item.category))]
+              
             }
           })
         },
         methods: {
-          categoryEmoji(category){
+          getFirstEmojiByCategory(category){
             return this.dictionary.words.find((word) => word.category == category).emoji
+          },
+          getWordsByCategory(category){
+            return this.dictionary.words.filter(word => {return word.category === category})
+          },
+          getRandomWordByCategory(category){
+            word = this.getWordsByCategory(category).random()
+            if(this.state.usedWords.includes(word.en)){
+              console.log("already used", word)
+            }
+            
+            this.state.usedWords.push(word.en)
+            return word
           },
           start(category){
             this.state.category = category
+            this.state.currentWord = this.getRandomWordByCategory(category)
+            this.state.alternatives.push(this.state.currentWord)
+            for(var i = 0; i < 3; i++){
+              this.state.alternatives.push(this.getRandomWordByCategory(category))
+            }
+            this.state.alternatives.sort( () => .5 - Math.random() )
           }
         }
       }).mount('#emoji-lingo')
