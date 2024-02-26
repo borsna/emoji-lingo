@@ -18,17 +18,35 @@
         -ms-user-select: none; 
         user-select: none;*/
       }
+      .game{
+        margin-top: 1rem;
+      }
       .word{
-        font-size: 2rem;
-        margin:0.3rem;
+        margin-right:0.3rem;
+        margin-bottom: 0.3rem;
+        width: 47%;
+        height: 8rem;
+        font-size: 74px;
+        padding-top: 1.7rem;
       }
       .word-badge{
         margin-top:0.3rem;
         background-color: aliceblue;
       }
+      .word{
+        width: 47%;
+        height: 8rem;
+        font-size: 74px;
+        padding-top: 1.7rem;
+      }
+      .current-word{
+        width: 94.5%;
+      }
     </style>
   </head>
   <body>
+    
+  
     <div id="emoji-lingo">
       <nav class="light-blue lighten-1" role="navigation">
         <div class="nav-wrapper container">
@@ -36,10 +54,12 @@
           <span class="badge word-badge">{{ dictionary.words.length }} words</span>
         </div>
       </nav>
+      
+
       <div v-if="dictionary.words.length === 0" class="progress">
         <div class="indeterminate"></div>
       </div>
-      <div v-if="dictionary.words.length" class="container">
+      <div v-if="dictionary.words.length" class="container game">
         <div v-if="state.category == null">        
           <h3>Categories</h3>
           <div class="collection">
@@ -49,9 +69,12 @@
           </div>
         </div>
         <div v-if="state.category != null">
-          <p>{{ state.currentWord.en }}</p>
-          <a v-for="alternative in state.alternatives" class="waves-effect waves-light btn-large word">{{ alternative.emoji }}</a>
+          <a v-for="alternative in state.alternatives" @click="start(state.category)" class="waves-effect waves-light btn-large word">{{ alternative.emoji }}</a>
+          <div class="row">
+            <a class="btn-large disabled current-word" style="color: #222 ">{{ state.currentWord.en }}</a>
+          </div>
         </div>
+        
       </div>
     </div>
     
@@ -111,12 +134,17 @@
             return word
           },
           start(category){
+            this.state.alternatives = []
             this.state.category = category
             this.state.currentWord = this.getRandomWordByCategory(category)
             this.state.alternatives.push(this.state.currentWord)
-            for(var i = 0; i < 3; i++){
-              this.state.alternatives.push(this.getRandomWordByCategory(category))
-            }
+            do{
+              let alternativeWord = this.getWordsByCategory(category).random();
+              if(!this.state.alternatives.includes(alternativeWord)){
+                this.state.alternatives.push(alternativeWord)
+              }
+            }while(this.state.alternatives.length != 4)
+
             this.state.alternatives.sort( () => .5 - Math.random() )
           }
         }
