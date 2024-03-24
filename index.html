@@ -63,15 +63,20 @@
         <div v-if="state.category == null">        
           <h3>Categories</h3>
           <div class="collection">
-            <a v-for="category in dictionary.categories" @click="start(category)" href="#" class="collection-item">
+            <a v-for="category in dictionary.categories" @click="drawWord(category)" href="#" class="collection-item">
               {{ getFirstEmojiByCategory(category) }} {{ category }}
             </a>
           </div>
         </div>
         <div v-if="state.category != null">
-          <a v-for="alternative in state.alternatives" @click="start(state.category)" class="waves-effect waves-light btn-large word">{{ alternative.emoji }}</a>
+          <a v-for="alternative in state.alternatives" @click="guessWord(alternative)" class="waves-effect waves-light btn-large word">{{ alternative.emoji }}</a>
           <div class="row">
-            <a class="btn-large disabled current-word" style="color: #222 ">{{ state.currentWord.en }}</a>
+            <a class="btn-large disabled current-word" style="color: #222 ">
+              {{ state.currentWord.jpKana }} <em>{{ state.currentWord.jpRomanji }}</em>            
+            </a>
+          </div>
+          <div class="row" v-if="state.total > 0">
+            <meter :value="state.correct / state.total" style="width: 94.5%;"></meter>
           </div>
         </div>
         
@@ -86,7 +91,7 @@
       }
             
       Array.prototype.random = function () {
-        return this[Math.floor((Math.random()*this.length))];
+        return this[Math.floor((Math.random()*this.length))]
       }
 
       createApp({
@@ -96,7 +101,9 @@
             category: null,
             usedWords: [],
             currentWord : null,
-            alternatives : []
+            alternatives : [],
+            correct:0,
+            total: 0
           })
 
           return {
@@ -113,7 +120,6 @@
               console.log(self.dictionary.words)
               self.dictionary.words = results.data.filter(word => {return word.jpKana != ''})
               self.dictionary.categories = [...new Set(self.dictionary.words.map(item => item.category))]
-              
             }
           })
         },
@@ -133,19 +139,26 @@
             this.state.usedWords.push(word.en)
             return word
           },
-          start(category){
+          drawWord(category){
             this.state.alternatives = []
             this.state.category = category
             this.state.currentWord = this.getRandomWordByCategory(category)
             this.state.alternatives.push(this.state.currentWord)
             do{
-              let alternativeWord = this.getWordsByCategory(category).random();
+              let alternativeWord = this.getWordsByCategory(category).random()
               if(!this.state.alternatives.includes(alternativeWord)){
                 this.state.alternatives.push(alternativeWord)
               }
             }while(this.state.alternatives.length != 4)
 
             this.state.alternatives.sort( () => .5 - Math.random() )
+          },
+          guessWord(word){
+            this.state.total++
+            if(this.state.currentWord.emoji === word.emoji){
+              this.state.correct++
+            }
+            this.drawWord(this.state.category)
           }
         }
       }).mount('#emoji-lingo')
